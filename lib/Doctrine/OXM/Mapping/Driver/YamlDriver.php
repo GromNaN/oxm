@@ -29,7 +29,7 @@ use \Doctrine\OXM\Mapping\ClassMetadataInfo;
  * @version $Revision$
  * @author  Richard Fullmer <richard.fullmer@opensoftdev.com>
  */
-class YAMLDriver extends AbstractFileDriver
+class YamlDriver extends AbstractFileDriver
 {
     /**
      * Whether the class with the specified name should have its metadata loaded.

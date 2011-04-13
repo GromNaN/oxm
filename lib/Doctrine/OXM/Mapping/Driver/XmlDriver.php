@@ -30,7 +30,7 @@ use \Doctrine\OXM\Mapping\ClassMetadataInfo;
  * @version $Revision$
  * @author  Richard Fullmer <richard.fullmer@opensoftdev.com>
  */
-class XMLDriver extends AbstractFileDriver
+class XmlDriver extends AbstractFileDriver
 {
     /**
      * Whether the class with the specified name should have its metadata loaded.
