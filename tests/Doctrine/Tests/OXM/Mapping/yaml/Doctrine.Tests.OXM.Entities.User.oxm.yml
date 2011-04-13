@@ -1,0 +1,27 @@
+Doctrine\Tests\OXM\Entities\User:
+  type: XmlRootEntity
+  xml: User
+  fields:
+    id:
+      schema: attribute
+      type: integer
+      direct: true
+    firstNameNickname:
+      schema: text
+      type: string
+    lastName:
+      schema: attribute
+      type: string
+      name: LastName
+    address:
+      schema: element
+      type: Doctrine\Tests\OXM\Entities\Address
+    contact: 
+      schema: element
+      type: Doctrine\Tests\OXM\Entities\CustomerContact
+      collection: true
+      direct: true
+      name: "customer-contact"
+  lifecycleCallbacks:
+    preMarshal: [validate]
+    postMarshal: [ensure]

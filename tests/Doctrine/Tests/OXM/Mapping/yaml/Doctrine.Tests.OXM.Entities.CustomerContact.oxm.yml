@@ -1,0 +1,11 @@
+Doctrine\Tests\OXM\Entities\CustomerContact:
+  type: XmlEntity
+  xml: User
+  fields:
+    emailAddress:
+      type: string
+      direct: true
+      name: emailAddress
+    phoneNumber:
+      type: string
+      direct: true

@@ -1,0 +1,11 @@
+Doctrine\Tests\OXM\Entities\Address:
+  type: XmlRootEntity
+  xml: User
+  fields:
+    street:
+      type: string
+    city:
+      schema: text
+      type: string
+    state:
+      type: string
