@@ -28,32 +28,15 @@ use \Doctrine\OXM\Mapping\ClassMetadataInfo;
  * @since   2.0
  * @version $Revision$
  * @author  Richard Fullmer <richard.fullmer@opensoftdev.com>
+ * @author  Jérôme Tamarelle <jerome@tamarelle.net>
  */
 class YamlDriver extends AbstractFileDriver
 {
-    /**
-     * Whether the class with the specified name should have its metadata loaded.
-     * This is only the case if it is either mapped as an XmlEntity
-     *
-     * @param string $className
-     * @return boolean
-     */
-    function isTransient($className)
-    {
-        // TODO: Implement isTransient() method.
-        throw new \Exception("Not yet implemented");
-    }
 
     /**
-     * Gets the names of all mapped classes known to this driver.
-     *
-     * @return array The names of all mapped classes known to this driver.
+     * {@inheritdoc}
      */
-    public function getAllClassNames()
-    {
-        // TODO: Implement getAllClassNames() method.
-        throw new \Exception("Not yet implemented");
-    }
+    protected $_fileExtension = '.oxm.yml';
 
     /**
      * Loads the mapping for the specified class into the provided container.
@@ -63,8 +46,66 @@ class YamlDriver extends AbstractFileDriver
      */
     public function loadMetadataForClass($className, ClassMetadataInfo $mapping)
     {
-        // TODO: Implement loadMappingForClass() method.
-        throw new \Exception("Not yet implemented");
+        $reflClass = $metadata->getReflectionClass();
+        $element = $this->getElement($className);
+
+        if('XmlRootEntity' == $element['type']) {
+            $metadata->isRoot = true;
+        } else if ('XmlMappedSuperclass' == $element['type']) {
+            $metadata->isMappedSuperclass = true;
+        }
+
+        $metadata->setName($reflClass->getName());
+
+        if (isset($element['xml'])) {
+            $metadata->setXmlName($element['xml']);
+        } else {
+            $metadata->setXmlName(Inflector::xmlize($reflClass->getShortName()));
+        }
+
+        if (isset($element['repositoryClass'])) {
+            $metadata->setCustomRepositoryClass($element['repositoryClass']);
+        }
+
+        if (isset($element['changeTrackingPolicy'])) {
+            $changeTracking = $element['changeTrackingPolicy'];
+            $metadata->setChangeTrackingPolicy(constant('Doctrine\OXM\Mapping\ClassMetadata::CHANGETRACKING_' . $changeTracking));
+        }
+
+        if (isset($element['namespace'])) {
+            $xmlNamespaces = array($element['namespace']);
+        } else if (isset($element['namespaces'])) {
+            $xmlNamespaces = $element['namespaces'];
+        }
+        $metadata->setXmlNamespaces($xmlNamespaces);
+
+        if (isset($element['fields'])) {
+            foreach($element['fields'] as $fieldName => $field) {
+                $mapping = $field;
+                $mapping['fieldName'] = $fieldName;
+
+                if (!isset($field['type'])) {
+                    throw MappingException::propertyTypeIsRequired($className, $fieldName);
+                }
+
+                $metadata->mapField($mapping);
+            }
+        }
+
+        if (isset($element['lifecycleCallbacks'])) {
+            foreach($element['lifecycleCallbacks'] as $event => $methods) {
+                foreach($methods as $method) {
+                    $metadata->addLifecycleCallback($method, $event);
+                }
+            }
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function _loadMappingFile($file)
+    {
+        return \Symfony\Component\Yaml\Yaml::load($file);
+    }
 }

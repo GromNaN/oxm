@@ -171,4 +171,16 @@ class MappingException extends OXMException
             "field does not exist or an association exists but it has multiple join columns.");
     }
 
+    public static function fileMappingDriversRequireConfiguredDirectoryPath($path = null)
+    {
+        if ( ! empty($path)) {
+            $path = '[' . $path . ']';
+        }
+
+        return new self(
+            'File mapping drivers must have a valid directory path, ' .
+            'however the given path ' . $path . ' seems to be incorrect!'
+        );
+    }
+
 }
